@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:math';
 
 import 'package:auto_route/src/matcher/route_match.dart';
 import 'package:collection/collection.dart';
@@ -178,9 +179,7 @@ class RouteMatcher {
     var parts = p.split(config.path);
     var segments = p.split(url.path);
 
-    if (parts.length > segments.length) {
-      return null;
-    }
+    final commonLength = min(parts.length, segments.length);
 
     if (config.fullMatch &&
         segments.length > parts.length &&
@@ -189,7 +188,7 @@ class RouteMatcher {
     }
 
     var pathParams = <String, String>{};
-    for (var index = 0; index < parts.length; index++) {
+    for (var index = 0; index < commonLength; index++) {
       var segment = segments[index];
       var part = parts[index];
       if (part.startsWith(':')) {
@@ -199,7 +198,7 @@ class RouteMatcher {
       }
     }
 
-    var extractedSegments = segments.sublist(0, parts.length);
+    var extractedSegments = segments.sublist(0, commonLength);
     if (parts.isNotEmpty && parts.last == "*") {
       extractedSegments = segments;
     }
