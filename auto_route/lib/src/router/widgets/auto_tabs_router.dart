@@ -170,17 +170,30 @@ class AutoTabsRouterState extends State<AutoTabsRouter>
   @override
   void didUpdateWidget(covariant AutoTabsRouter oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!ListEquality().equals(widget.routes, oldWidget.routes)) {
+    final routesChanged =
+        !ListEquality().equals(widget.routes, oldWidget.routes);
+    if (routesChanged) {
       _controller!.replaceAll(widget.routes);
     }
-    if (widget.declarative && widget._activeIndex != oldWidget._activeIndex) {
-      _animationController.value = 1.0;
-      _index = widget._activeIndex!;
-      _animationController.forward(from: 0.0);
-      _controller!.setActiveIndex(_index, notify: false);
-      WidgetsBinding.instance?.addPostFrameCallback((_) {
-        AutoRouterDelegate.of(context).notifyUrlChanged();
-      });
+    if (widget.declarative) {
+      final activeIndexChanged = widget._activeIndex != oldWidget._activeIndex;
+      if (activeIndexChanged) {
+        _animationController.value = 1.0;
+        _index = widget._activeIndex!;
+        _animationController.forward(from: 0.0);
+        _controller!.setActiveIndex(_index, notify: false);
+        WidgetsBinding.instance?.addPostFrameCallback((_) {
+          AutoRouterDelegate.of(context).notifyUrlChanged();
+        });
+      } else if (routesChanged &&
+          widget.routes[widget._activeIndex!] !=
+              oldWidget.routes[oldWidget._activeIndex!]) {
+        // Current route has changed, while `activeIndex` is the same, so
+        // only notify that URL has changed, without triggering any animations.
+        WidgetsBinding.instance?.addPostFrameCallback((_) {
+          AutoRouterDelegate.of(context).notifyUrlChanged();
+        });
+      }
     }
   }
 
