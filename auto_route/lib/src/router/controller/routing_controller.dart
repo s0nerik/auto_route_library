@@ -602,15 +602,19 @@ abstract class StackRouter extends RoutingController {
 
   @override
   void dispose() {
-    super.dispose();
     _redirectGuardsListeners.forEach(
       (guard, listener) {
-        guard.removeListener(listener);
-        guard.dispose();
+        try {
+          guard.removeListener(listener);
+          guard.dispose();
+        } catch (_) {}
       },
     );
-    pagelessRoutesObserver.removeListener(notifyListeners);
-    pagelessRoutesObserver.dispose();
+    try {
+      pagelessRoutesObserver.removeListener(notifyListeners);
+      pagelessRoutesObserver.dispose();
+    } catch (_) {}
+    super.dispose();
   }
 
   @override
