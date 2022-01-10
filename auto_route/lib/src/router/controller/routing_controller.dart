@@ -1187,6 +1187,7 @@ class NestedStackRouter extends StackRouter {
   final RouteCollection routeCollection;
   final PageBuilder pageBuilder;
   final bool managedByWidget;
+  bool _disposed = false;
 
   RouteData _routeData;
 
@@ -1235,6 +1236,19 @@ class NestedStackRouter extends StackRouter {
 
   @override
   NavigationHistory get navigationHistory => root.navigationHistory;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  @override
+  void removeListener(VoidCallback listener) {
+    if (!_disposed) {
+      super.removeListener(listener);
+    }
+  }
 }
 
 class _RouterScopeResult<T extends RoutingController> {
