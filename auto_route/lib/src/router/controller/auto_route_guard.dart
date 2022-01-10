@@ -40,6 +40,7 @@ class NavigationResolver {
 
 abstract class AutoRedirectGuard extends AutoRouteGuard with ChangeNotifier {
   late ReevaluationStrategy _strategy;
+  bool _disposed = false;
 
   ReevaluationStrategy get strategy => _strategy;
 
@@ -58,6 +59,23 @@ abstract class AutoRedirectGuard extends AutoRouteGuard with ChangeNotifier {
 
   void _reevaluate(StackRouter stackRouter) {
     _strategy.reevaluate(this, stackRouter);
+  }
+
+  @override
+  void removeListener(VoidCallback listener) {
+    if (_disposed) {
+      return;
+    }
+    super.removeListener(listener);
+  }
+
+  @override
+  void dispose() {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
+    super.dispose();
   }
 }
 
