@@ -555,6 +555,7 @@ abstract class StackRouter extends RoutingController {
   final LocalKey key;
   final GlobalKey<NavigatorState> _navigatorKey;
   final OnNestedNavigateCallBack? onNavigate;
+  bool _disposed = false;
 
   StackRouter({
     required this.key,
@@ -601,7 +602,20 @@ abstract class StackRouter extends RoutingController {
   }
 
   @override
+  void removeListener(VoidCallback listener) {
+    if (_disposed) {
+      return;
+    }
+    super.removeListener(listener);
+  }
+
+  @override
   void dispose() {
+    if (_disposed) {
+      return;
+    }
+    _disposed = true;
+
     _redirectGuardsListeners.forEach(
       (guard, listener) {
         try {
